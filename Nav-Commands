@@ -1,0 +1,23 @@
+##Disable watchdog:
+echo 0 | sudo tee /proc/sys/kernel/nmi_watchdog
+
+#Disable kptr:
+echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
+
+##sample every 2000 instructions for command make
+sudo perf record -e instructions:u -c 2000 make
+
+
+## Using ocperf
+sudo python ocperf.py stat -e io_transactions -I1000 -x, -o data.csv -p 7034
+python interval-plot.py --style ggplot data.csv &
+
+#all
+sudo python ocperf.py stat -e cache-references,cache-misses,branch-instructions,branch-misses,stalled-cycles-frontend
+io_transactions -I1000 -x, -o data.csv -p 7034
+
+
+
+##### FINAL COMMANDS###########
+sudo python main.py
+python interval-plot.py --seq results-mem-meminter --style ggplot mem-meminter.csv

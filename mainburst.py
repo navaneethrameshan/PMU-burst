@@ -7,12 +7,12 @@ import os
 import signal
 import sys
 import shutil
-from config import *
+import config
 
 map_pid_filehandle = {}
 
 def remove_and_open_file():
-    for key,values in map_pid_filename.items():
+    for key,values in config.map_pid_filename.items():
         if os.path.exists(values['filename']):
             os.remove(values['filename'])
         map_pid_filehandle[key] = open(values['filename'],'w+')
@@ -32,11 +32,11 @@ def file_close():
 def measure():
 
     os.umask(0000)
-    if os.path.exists(csv_dir):
-        shutil.rmtree(csv_dir)
-        os.mkdir(csv_dir)
+    if os.path.exists(config.csv_dir):
+        shutil.rmtree(config.csv_dir)
+        os.makedirs(config.csv_dir)
     else:
-        os.mkdir(csv_dir)
+        os.makedirs(config.csv_dir)
 
     count=0
     pid_list=[]
@@ -56,7 +56,8 @@ def measure():
             print "No process running"
             return
 
-        for key, values in map_pid_filename.items():
+        for key, values in config.map_pid_filename.items():
+            print "Map Items: " ,config.map_pid_filename
             if values['type'] =='spec':
                 pid = util.get_pid_spec(key)
                 pid_list.append(pid)
@@ -68,10 +69,10 @@ def measure():
             if pid:
                 print "PID: ",key, pid
                 try:
-                    file_name = csv_dir+values['filename']+"_"+str(count)+".csv"
+                    file_name = config.csv_dir+values['filename']+"_"+str(count)+".csv"
                     print file_name
-                    vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(counters),"-x,","-p",
-                                            pid, "-o",file_name ,"sleep", str(monitor_period)])
+                    vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(config.counters),"-x,","-p",
+                                            pid, "-o",file_name ,"sleep", str(config.monitor_period)])
                     vm_1.wait()
                     #print vm_1.stdout.read()
                     #write_to_file(map_pid_filehandle[key], vm_1.stdout.read())

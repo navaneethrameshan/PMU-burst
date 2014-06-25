@@ -16,12 +16,11 @@ counters=['cache-references','cache-misses','branch-instructions','branch-misses
           'offcore_response.corewb.local_dram_0','offcore_response.corewb.local_dram_1']
 
 monitor_period = 2
-csv_dir = "csv/soplex/"
-map_pid_filename = {'soplex': {'filename':'soplex', 'type':'spec'}}
-    #, 'mem': {'filename':'mbw', 'type':'None'}}
+csv_dir = "csv/omnetpp-mem/"
+map_pid_filename = {'lol': {'filename':'lol', 'type':'spec'} , 'lol': {'filename':'lolmax', 'type':'None'}}
 
 
 #### plot ###############################################
 normalize= False
 burst = True
-result_dir = "result-burst/soplex/"
+result_dir = "result-burst/lol/"

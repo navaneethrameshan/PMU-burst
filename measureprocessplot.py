@@ -35,6 +35,10 @@ def process_plot():
 
     print "Results can be found in: " + config.csv_dir
 
+def measure_process_plot():
+    mainburst.measure()
+    process_plot()
+
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
 

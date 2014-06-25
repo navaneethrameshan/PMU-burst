@@ -27,10 +27,10 @@ def uptime():
     if _is_host_up(env.host, int(env.port)) is True:
         run("uptime")
 
-def run_spec():
+def run_spec(app,result):
     if _is_host_up(env.host, int(env.port)) is True:
         with cd("cpu2006-installed"):
-            run(". ./shrc; time bin/runspec --config nav-gcc43.cfg --noreportable --iterations=1 471.omnetpp > result-log", pty=False)
+            run(". ./shrc; nohup runspec --config nav-gcc43.cfg --noreportable --nobuild --iterations=1 "+ app+" >" +result+ " &", pty=False)
 
 
 def _is_host_up(host, port):

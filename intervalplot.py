@@ -22,13 +22,13 @@ from config import *
 
 def plot(file,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
 
-    op_sum = [['L1-dcache-loads','L1-dcache-stores','L1-dcache-prefetches','L1-icache-loads'],
-              ['L1-dcache-load-misses','L1-dcache-store-misses','L1-dcache-prefetch-misses','L1-icache-load-misses'],
-              [ 'LLC-loads','LLC-stores','LLC-prefetches'],
-              ['LLC-load-misses','LLC-store-misses','LLC-prefetch-misses'],
-              ['dTLB-loads','dTLB-stores','iTLB-loads'],
-              ['dTLB-load-misses','dTLB-store-misses','iTLB-load-misses'],
-              ['offcore_response_corewb_local_dram_0','offcore_response_prefetch_any_llc_miss_0','LLC-prefetches','cache-misses']]
+    op_sum = {'1':['L1-dcache-loads','L1-dcache-stores','L1-dcache-prefetches','L1-icache-loads'],
+              '2':['L1-dcache-load-misses','L1-dcache-store-misses','L1-dcache-prefetch-misses','L1-icache-load-misses'],
+              '3':[ 'LLC-loads','LLC-stores','LLC-prefetches'],
+              '4':['LLC-load-misses','LLC-store-misses','LLC-prefetch-misses'],
+              '5':['dTLB-loads','dTLB-stores','iTLB-loads'],
+              '6':['dTLB-load-misses','dTLB-store-misses','iTLB-load-misses'],
+              'Bandwidth':['offcore_response_corewb_local_dram_0','offcore_response_prefetch_any_llc_miss_0','LLC-prefetches','cache-misses']}
     op_div = [['cache-references','uops_retired_any'],['cache-misses','uops_retired_any'], ['instructions','cycles'],
               ['cache-misses','cache-references']]
 
@@ -158,7 +158,7 @@ def plot(file,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
 
 
     if len(op_sum) > 0:
-        for components in op_sum:
+        for key, components in op_sum.items():
             print components
             #print [(value[component]) for component in components]
             #print [len(value[component]) for component in components]

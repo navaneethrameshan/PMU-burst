@@ -21,8 +21,8 @@ def signal_handler(signal,frame):
 
 
 def process_plot():
-    print "Post processing"
-    postprocess.process()
+   # print "Post processing"
+   # postprocess.process()
 
     for key,values in config.map_pid_filename.items():
         print "Plot and Store: ", values['filename']
@@ -36,7 +36,7 @@ def process_plot():
     print "Results can be found in: " + config.csv_dir
 
 def measure_process_plot():
-    mainburst.measure()
+    #mainburst.measure()
     process_plot()
 
 if __name__ == '__main__':

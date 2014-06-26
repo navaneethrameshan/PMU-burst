@@ -19,18 +19,20 @@ import time
 from config import *
 
 
+csv_file_handle = {}
 
 def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
+    global csv_file_handle
+    csv_file_handle ={}
 
-    csv_file_handle = {}
+    op_sum = {'1':['L1-dcache-loads','L1-dcache-stores','L1-dcache-prefetches','L1-icache-loads'],
+              '2':['L1-dcache-load-misses','L1-dcache-store-misses','L1-dcache-prefetch-misses','L1-icache-load-misses'],
+              '3':[ 'LLC-loads','LLC-stores','LLC-prefetches'],
+              '4':['LLC-load-misses','LLC-store-misses','LLC-prefetch-misses'],
+              '5':['dTLB-loads','dTLB-stores','iTLB-loads'],
+              '6':['dTLB-load-misses','dTLB-store-misses','iTLB-load-misses'],
+              'Bandwidth':['offcore_response_corewb_local_dram_0','offcore_response_prefetch_any_llc_miss_0','LLC-prefetches','cache-misses']}
 
-    op_sum = [['L1-dcache-loads','L1-dcache-stores','L1-dcache-prefetches','L1-icache-loads'],
-              ['L1-dcache-load-misses','L1-dcache-store-misses','L1-dcache-prefetch-misses','L1-icache-load-misses'],
-              [ 'LLC-loads','LLC-stores','LLC-prefetches'],
-              ['LLC-load-misses','LLC-store-misses','LLC-prefetch-misses'],
-              ['dTLB-loads','dTLB-stores','iTLB-loads'],
-              ['dTLB-load-misses','dTLB-store-misses','iTLB-load-misses'],
-              ['offcore_response_corewb_local_dram_0','offcore_response_prefetch_any_llc_miss_0','LLC-prefetches','cache-misses']]
     op_div = [['cache-references','uops_retired_any'],['cache-misses','uops_retired_any'], ['instructions','cycles'],
               ['cache-misses','cache-references']]
 
@@ -162,22 +164,46 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
         leg.get_frame().set_alpha(0.5)
         n += 1
 
-
     if len(op_sum) > 0:
-        for components in op_sum:
+        for key, components in op_sum.items():
             print components
             #print [(value[component]) for component in components]
             #print [len(value[component]) for component in components]
+            sum_value={}
+            if key =='Bandwidth':
+                    ax1 = plt.subplot(2,1,1)
+                    ax2 = plt.subplot(2,1,2)
+
             for processname in csv_file_handle:
-                sum_value=sum(map(numpy.array, [value[str(processname)+"-"+component] for component in components]))
+
+                sum_value[processname]=sum(map(numpy.array, [value[str(processname)+"-"+component] for component in components]))
                 #print sum_value
                 #print "DONE!!"
                # print len(sum_value)
                # print len(timestamps[components[0]])
-                ax.plot(sum_value, label = str(processname)+"-"+'+'.join(components))
+                if key is not 'Bandwidth':
+                    ax.plot(sum_value[processname], label = str(processname)+"-"+'+'.join(components))
+                else:
+                    ax1.plot(sum_value[processname], label = str(processname)+"-"+'+'.join(components))
+
                 if seq:
-                    leg = ax.legend(loc='upper left')
+                    if key is not 'Bandwidth':
+                        leg = ax.legend(loc='upper left')
+                        leg.get_frame().set_alpha(0.5)
+                    else:
+                        leg = ax1.legend(loc='upper left')
+                        leg.get_frame().set_alpha(0.5)
+
+            if key =='Bandwidth':
+            #plot the drop in performance of each process:
+                perf_drop = compute_drop(sum_value)
+                for process, drop in perf_drop.items():
+                    ax2.plot(drop, label="Drop in perf of "+str(process))
+
+                    leg=ax2.legend(loc= 'upper left')
                     leg.get_frame().set_alpha(0.5)
+
+
             plt.savefig(seq+"/"+'+'.join(components))
             plt.cla()
 
@@ -205,6 +231,38 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
         if not seq:
             plt.show()
 
+
+
+def compute_drop(all_bw):
+    '''
+
+    :param all_list:dictionary containing bandwidth usage of each process. ex: {'process1':[..], 'process2':[]}
+    :return: returns a dictionary of estimated drop in performance of each application
+    '''
+
+    max_Bandwidth = 4.3*10**8
+
+    drop_in_performance = {}
+
+    for processname in csv_file_handle:
+    #In each iteration, compute the drop in performance for processname
+        percentage_share= {}
+
+        for current_process,bw_usage_list in all_bw.items():
+        # For processname, compute the percentage share of unused bandwidth by all other processes
+            if current_process == processname:
+                continue
+            percentage_share[current_process] =  []
+
+            for i in xrange(0, len(all_bw[processname])):
+                if i< len(bw_usage_list):
+                    percentage_share[current_process].append(bw_usage_list[i]/(max_Bandwidth - all_bw[processname][i]))
+                else:
+                    percentage_share[current_process].append(0)
+
+        drop_in_performance[processname] = sum(map(numpy.array, [percentage_share[process] for process in percentage_share]))
+
+    return drop_in_performance
 
 if __name__ =='__main__':
 

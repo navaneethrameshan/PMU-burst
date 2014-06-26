@@ -22,10 +22,10 @@ def get_pid_spec(process):
         return s[1]
 
 def setup_config(process_1, process_2):
-    config.csv_dir = "csv-automated-burst/"+ str(process_1[4:])+"-"+str(process_2[4:])+"/"
+    config.csv_dir = "csv-automated-burst-all/"+ str(process_1[4:])+"-"+str(process_2[4:])+"/"
     config.map_pid_filename={str(process_1[4:]):{'filename':str(process_1[4:]), 'type':'spec'},
                              str(process_2[4:]):{'filename':str(process_2[4:]), 'type':'spec'}}
-    config.result_dir="result-automated-burst/" + str(process_1[4:])+"-"+str(process_2[4:])+"/"
+    config.result_dir="result-automated-burst-all/" + str(process_1[4:])+"-"+str(process_2[4:])+"/"
 
 if __name__ == '__main__':
    print  get_pid_spec("lbm")

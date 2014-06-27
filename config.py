@@ -16,11 +16,13 @@ counters=['cache-references','cache-misses','branch-instructions','branch-misses
           'offcore_response.corewb.local_dram_0','offcore_response.corewb.local_dram_1']
 
 monitor_period = 2
-csv_dir = "csv/omnetpp-mem/"
-map_pid_filename = {'lol': {'filename':'lol', 'type':'spec'} , 'lol': {'filename':'lolmax', 'type':'None'}}
+csv_dir = "csv-automated-burst-all/perlbench/"
+map_pid_filename = {'perlbench': {'filename':'perlbench', 'type':'spec'}}
 
+
+execution_time_dir="execution-times"
 
 #### plot ###############################################
 normalize= False
 burst = True
-result_dir = "result-burst/lol/"
+result_dir = "result-automated-burst-all/perlbench/"

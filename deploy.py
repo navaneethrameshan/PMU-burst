@@ -32,6 +32,10 @@ def run_spec(app,result):
         with cd("cpu2006-installed"):
             run(". ./shrc; nohup runspec --config nav-gcc43.cfg --noreportable --nobuild --iterations=1 "+ app+" >" +result+ " &", pty=False)
 
+def fetch_result(dir):
+    if _is_host_up(env.host, int(env.port)) is True:
+        with cd("cpu2006-installed"):
+            get('result-*',dir)
 
 def _is_host_up(host, port):
     # Set the timeout

@@ -16,8 +16,7 @@ import argparse
 import shutil
 import numpy
 import time
-from config import *
-
+import config
 
 csv_file_handle = {}
 
@@ -83,7 +82,7 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
     for processname,rc in  csv_file_handle.items():
 
         for r in rc:
-            if burst:
+            if config.burst:
                 if len(r) == 2:
                     ts=0
                     val, event = r
@@ -123,7 +122,7 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
 
     #print value
 
-    if normalize:
+    if config.normalize:
         for key in value:
             entries= value[key]
             normalized_values = [numpy.float64(entry)/max(entries) for entry in entries]
@@ -164,6 +163,7 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
         leg.get_frame().set_alpha(0.5)
         n += 1
 
+
     if len(op_sum) > 0:
         for key, components in op_sum.items():
             print components
@@ -173,6 +173,8 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
             if key =='Bandwidth':
                     ax1 = plt.subplot(2,1,1)
                     ax2 = plt.subplot(2,1,2)
+            else:
+                    ax = plt.subplot(1, 1, 1)
 
             for processname in csv_file_handle:
 
@@ -199,6 +201,13 @@ def plot(files,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
                 perf_drop = compute_drop(sum_value)
                 for process, drop in perf_drop.items():
                     ax2.plot(drop, label="Drop in perf of "+str(process))
+
+                    #change to a function later
+                    avg_perf_drop = sum(drop)/len(drop)
+                    f_handle= open(config.execution_time_dir+'/estimateddrop-'+process+'-'+
+                                   ''.join([p if p is not process else '' for p,d in perf_drop.items()])+'.log','w+')
+                    f_handle.write(str(avg_perf_drop))
+                    f_handle.close()
 
                     leg=ax2.legend(loc= 'upper left')
                     leg.get_frame().set_alpha(0.5)
@@ -257,8 +266,8 @@ def compute_drop(all_bw):
             for i in xrange(0, len(all_bw[processname])):
                 if i< len(bw_usage_list):
                     percentage_share[current_process].append(bw_usage_list[i]/(max_Bandwidth - all_bw[processname][i]))
-                else:
-                    percentage_share[current_process].append(0)
+                #else:
+                   # percentage_share[current_process].append(0)
 
         drop_in_performance[processname] = sum(map(numpy.array, [percentage_share[process] for process in percentage_share]))
 
@@ -286,10 +295,10 @@ if __name__ =='__main__':
     #print args
 
     if args.auto:
-        for key,values in map_pid_filename.items():
+        for key,values in config.map_pid_filename.items():
             print "Plot and Store: ", values['filename']
-            filename = csv_dir+values['filename']
-            result_folder = result_dir+values['filename']
+            filename = config.csv_dir+values['filename']
+            result_folder = config.result_dir+values['filename']
             print result_folder
             plot(filename, seq=result_folder)
 

@@ -28,4 +28,4 @@ def setup_config(process_1, process_2):
     config.result_dir="result-automated-burst-all/" + str(process_1[4:])+"-"+str(process_2[4:])+"/"
 
 if __name__ == '__main__':
-   print  get_pid_spec("lbm")
+   print get_pid_spec("lbm")

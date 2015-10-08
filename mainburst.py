@@ -8,6 +8,7 @@ import signal
 import sys
 import shutil
 import config
+from monitorcpu import *
 
 map_pid_filehandle = {}
 
@@ -29,18 +30,26 @@ def file_close():
         map_pid_filehandle[key].close()
 
 
-def measure():
+def measure(csvdir=None):
+
+    csvdirname = config.csv_dir
+
+    if csvdir:
+        csvdirname = csvdir
+
 
     os.umask(0000)
-    if os.path.exists(config.csv_dir):
-        shutil.rmtree(config.csv_dir)
-        os.makedirs(config.csv_dir)
+    if os.path.exists(csvdirname):
+        shutil.rmtree(csvdirname)
+        os.makedirs(csvdirname)
     else:
-        os.makedirs(config.csv_dir)
+        os.makedirs(csvdirname)
 
     count=0
     pid_list=[]
     atleast_one_running = True
+
+
     while 1:
         #print "PID_LIST: ", pid_list
         for value in pid_list:
@@ -69,16 +78,33 @@ def measure():
             if pid:
                 print "PID: ",key, pid
                 try:
-                    file_name = config.csv_dir+values['filename']+"_"+str(count)+".csv"
+                    file_name = csvdirname+values['filename']+"_"+str(count)+".csv"
                     print file_name
-                    vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(config.counters),"-x,","-p",
+                    if values['type'] =='affinity':
+                        print "Monitoring " + values['filename']+ "on cores" + config.cores
+                        vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(config.counters),"-x,","-a",
+                                            "-C", config.cores,"-o",file_name ,"sleep", str(config.monitor_period)])
+                        vm_1.wait()
+                    else:
+                        vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(config.counters),"-x,","-p",
                                             pid, "-o",file_name ,"sleep", str(config.monitor_period)])
-                    vm_1.wait()
+                        vm_1.wait()
                     #print vm_1.stdout.read()
                     #write_to_file(map_pid_filehandle[key], vm_1.stdout.read())
 
                 except:
                     continue
+
+        usage = per_processor_usage()
+        #CPU values
+        file_name = csvdirname+"cpu.csv"
+        file_handle = open(file_name,'a')
+
+        file_handle.write(str(usage['1']) +'\n')
+
+        file_handle.close()
+
+
         print "---------------------------------------------------"
         print "Done"
         print "---------------------------------------------------"

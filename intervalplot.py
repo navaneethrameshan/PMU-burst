@@ -22,15 +22,26 @@ from config import *
 
 def plot(file,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
 
-    op_sum = {'1':['L1-dcache-loads','L1-dcache-stores','L1-dcache-prefetches','L1-icache-loads'],
-              '2':['L1-dcache-load-misses','L1-dcache-store-misses','L1-dcache-prefetch-misses','L1-icache-load-misses'],
-              '3':[ 'LLC-loads','LLC-stores','LLC-prefetches'],
-              '4':['LLC-load-misses','LLC-store-misses','LLC-prefetch-misses'],
-              '5':['dTLB-loads','dTLB-stores','iTLB-loads'],
-              '6':['dTLB-load-misses','dTLB-store-misses','iTLB-load-misses'],
-              'Bandwidth':['offcore_response_corewb_local_dram_0','offcore_response_prefetch_any_llc_miss_0','LLC-prefetches','cache-misses']}
-    op_div = [['cache-references','uops_retired_any'],['cache-misses','uops_retired_any'], ['instructions','cycles'],
-              ['cache-misses','cache-references']]
+    # op_sum = {'1':['L1-dcache-loads','L1-dcache-stores','L1-dcache-prefetches','L1-icache-loads'],
+    #           '2':['L1-dcache-load-misses','L1-dcache-store-misses','L1-dcache-prefetch-misses','L1-icache-load-misses'],
+    #           '3':[ 'LLC-loads','LLC-stores','LLC-prefetches'],
+    #           '4':['LLC-load-misses','LLC-store-misses','LLC-prefetch-misses'],
+    #           '5':['dTLB-loads','dTLB-stores','iTLB-loads'],
+    #           '6':['dTLB-load-misses','dTLB-store-misses','iTLB-load-misses'],
+    #           'Bandwidth':['offcore_response_corewb_local_dram_0','offcore_response_prefetch_any_llc_miss_0','LLC-prefetches','cache-misses']}
+   # op_div = [['cache-references','uops_retired_any'],['cache-misses','uops_retired_any'], ['instructions','cycles'],
+   #           ['cache-misses','cache-references']]
+
+
+    #enable for i7
+
+    op_sum = {
+        'contention': ['cache-misses'],
+        'band': ['cache-references', 'cache-misses'],
+        'total_bandwidth': ['cache-references']
+    }
+
+    op_div= [['instructions','cycles'],['cache-misses','cache-references'],['cache-references','cycles'], ['cache-misses','cycles']]
 
 
     print  pstyle
@@ -57,7 +68,10 @@ def plot(file,  pstyle = 'ggplot', output=None, seq=None, xkcd=False):
     assigned = dict()
 
     if  file:
-        inf = open( file, "r")
+        try:
+            inf = open( file, "r")
+        except:
+            return
     else:
         inf = sys.stdin
 

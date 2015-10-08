@@ -20,8 +20,15 @@ counters=['cache-references','cache-misses','branch-instructions','branch-misses
           'offcore_response.prefetch.any_llc_miss_0','offcore_response.prefetch.any_llc_miss_1',
           'offcore_response.corewb.local_dram_0','offcore_response.corewb.local_dram_1']
 
+countersi7=['cache-references','cache-misses','branch-instructions','branch-misses','instructions',
+            'cycles','LLC-prefetches','inst_retired.prec_dist','uops_retired.all',
+            'mem_load_uops_llc_miss_retired.local_dram','offcore_response.all_data_rd.llc_miss.dram_0',
+            'offcore_response.all_data_rd.llc_miss.dram_1','offcore_response.all_reads.llc_miss.dram_0',
+            'offcore_response.all_reads.llc_miss.dram_1',
+            'mem_load_uops_retired.llc_hit']
+
 if __name__ == '__main__':
     pid = util.get_pid("mbw")
     print "PID: ", pid
-    vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(counters),"-I2000", "-x,", "-o", "mbw-cpu.csv", "-p",
+    vm_1= subprocess.call(["python", "ocperf.py", "stat", "-e", ','.join(countersi7),"-I2000", "-x,", "-o", "mbw-cpu.csv", "-p",
                       pid], stdout=PIPE)

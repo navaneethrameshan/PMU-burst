@@ -32,7 +32,7 @@ if __name__ == '__main__':
         resultdirname = config.result_dir
 
     if args['cores']:
-        cores = args['cores']
+        config.cores = args['cores']
     else:
         cores = config.cores
 

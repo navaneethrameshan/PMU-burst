@@ -41,7 +41,10 @@ def process(csvdir=None):
             #print number
             f.writelines(values[number].readlines())
 
-        f.close()
+        try:
+            f.close()
+        except:
+            continue
         #convert also to csv format for excel
         print "Converting to CSV"
         intervalnormalize.interval_normalize(name)
